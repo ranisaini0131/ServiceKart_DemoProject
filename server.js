@@ -7,7 +7,7 @@ import settings from "./src/database/db.js"
 
 
 const app = express()
-const port = 9090;
+const port = 9000;
 app.use(bodyParser.json())
 dotenv.config({
     path: "./.env"
@@ -28,10 +28,16 @@ export const qb = new queryBuilder(settings, 'mysql', 'single');
 
 //import api
 import userRoute from "./src/routes/userRoute.js"
+import addressRoute from "./src/routes/userRoute.js"
+import cardRoute from "./src/routes/cardsRoutes.js"
+import productRoute from "./src/routes/productRoute.js"
 
 
 
 app.use("/user", userRoute)
+app.use("/address", addressRoute)
+app.use("/card", cardRoute)
+app.use("/products", productRoute)
 
 
 
