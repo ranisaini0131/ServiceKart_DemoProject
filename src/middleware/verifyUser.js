@@ -3,6 +3,7 @@ import { qb } from "../../server.js"
 
 export const verifyJWT = async (req, res, next) => {
     try {
+
         const token = req.header
             ("Authorization")?.replace("Bearer ", "")
 

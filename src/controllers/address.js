@@ -4,10 +4,11 @@ import { qb } from "../../server.js"
 export const addAddress = async (req, res) => {
     try {
 
-        const { area, landmark, person_Name, address_Type, latitude, longitude, user_reference_id } = req.body
+        const { area, landmark, person_name, address_type, latitude, longitude, user_reference_id } = req.body
+
 
         //insert data
-        const addAddress = await qb.query(`INSERT INTO address (area, landmark, person_Name, address_Type, latitude, longitude, user_reference_id) VALUES ('${area}','${landmark}','${person_Name}','${address_Type}', '${latitude}', '${longitude}', '${user_reference_id}')`)
+        const addAddress = await qb.query(`INSERT INTO address (area, landmark, person_Name, address_Type, latitude, longitude, user_reference_id) VALUES ('${area}','${landmark}','${person_name}','${address_type}', '${latitude}', '${longitude}', '${user_reference_id}')`)
 
 
         if (!addAddress) {
@@ -36,7 +37,7 @@ export const addAddress = async (req, res) => {
 export const addressList = async (req, res) => {
     try {
 
-        const addressList = await qb.query(`SELECT * FROM address`)
+        const addressList = await qb.query(`SELECT area, landmark, person_name, address_type, latitude, longitude FROM address `)
 
         res.status(200).json({
             "message": "Address List",
@@ -60,7 +61,6 @@ export const updateAddress = async (req, res) => {
 
         const updateAddressData = `UPDATE address SET area = '${area}', landmark='${landmark}', person_Name='${person_Name}', address_Type='${address_Type}', latitude='${latitude}', longitude='${longitude}' WHERE user_reference_id = '${req.body.user}'`
 
-
         await qb.query(updateAddressData, async (err, results) => {
 
             if (err) {
@@ -74,7 +74,7 @@ export const updateAddress = async (req, res) => {
                 } else {
                     res.status(200)
                         .json({
-                            message: 'Address Supdated successfully'
+                            message: 'Address updated successfully'
                         });
                 }
             }
@@ -100,22 +100,50 @@ export const updateAddress = async (req, res) => {
 export const deleteAddress = async (req, res) => {
     try {
 
-        const deleteData = await qb.query(`DELETE FROM address WHERE user_reference_id = '${req.body.user}'`)
+        const deleteData = await qb.query(`SELECT status from address`)
+        console.log(deleteData[0].status, "s")
 
+        const addressStatus = deleteData[0].status
 
-        if (!deleteData) {
-            return res.status(500).json({
-                status: 'error',
-                message: "something went wrong while deleting the address"
+        const deleteAddressQuery = qb.query(`UPDATE address SET status = 2 WHERE id='${req.body.user}'`)
+
+        if (addressStatus === 1) {
+            res.status(400).json({
+                "message": 'Address is active'
+            });
+        } else {
+            await qb.query(deleteAddressQuery, async (err, results) => {
+                if (err) {
+                    console.log(err, "284")
+                    return err;
+                } else {
+                    if (results.affectedRows <= 0) {
+                        res.status(500).json({
+                            "message": 'Address is not deleted'
+                        });
+                    } else {
+                        res.status(200).json({
+                            "message": 'Address deleted successfully'
+                        });
+                    }
+                }
             })
+
+
+
+            // if (!deleteData) {
+            //     return res.status(500).json({
+            //         status: 'error',
+            //         message: "something went wrong while deleting the address"
+            //     })
+            // }
+
+            // res.status(200).json({
+            //     "message": "address deleted successfully",
+            //     "data": deleteData
+            // })
         }
-
-        res.status(200).json({
-            "message": "address deleted successfully",
-            "data": deleteData
-        })
-
-    } catch (error) {
+    } catch {
         console.log(error)
         return res
             .status(500)
@@ -125,6 +153,3 @@ export const deleteAddress = async (req, res) => {
             })
     }
 }
-
-//status key 0=inactive, 1 active 2=deleted, status column
-//created_at datetime bydefault currentime stamp

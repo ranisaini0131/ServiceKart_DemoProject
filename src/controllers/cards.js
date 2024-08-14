@@ -9,7 +9,7 @@ export const addCards = async (req, res) => {
         console.log(req.body)
 
         //insert data
-        const addCards = await qb.query(`INSERT INTO address (card_number,cvv, card_type, valid_upto, person_name, user_reference_id) VALUES ('${card_number}','${cvv}','${card_type}','${valid_upto}', '${person_name}','${user_reference_id}')`)
+        const addCards = await qb.query(`INSERT INTO card (card_number,cvv, card_type, valid_upto, person_name, user_reference_id) VALUES ('${card_number}','${cvv}','${card_type}','${valid_upto}', '${person_name}','${user_reference_id}')`)
 
 
         if (!addCards) {
@@ -20,7 +20,7 @@ export const addCards = async (req, res) => {
         }
 
         res.status(200).json({
-            "message": "address added successfully",
+            "message": "card added successfully",
             "data": addCards
         })
 
@@ -40,7 +40,7 @@ export const savedCardsList = async (req, res) => {
 
     try {
 
-        const savedCards = await qb.query(`SELECT * FROM cards`)
+        const savedCards = await qb.query(`SELECT card_number, cvv, card_type, valid_upto, person_name FROM card`)
 
         res.status(200).json({
             "message": "Address List",
@@ -91,7 +91,6 @@ export const deleteCard = async (req, res) => {
 
 
 
-
 //updateCard
 export const updateCard = async (req, res) => {
     try {
@@ -99,28 +98,22 @@ export const updateCard = async (req, res) => {
         const { card_number, cvv, card_type, valid_upto, person_name } = req.body;
 
 
-        const updateAddressData = `UPDATE address SET card_number= '${card_number}', cvv='${cvv}', card_type='${card_type}', valid_upto='${valid_upto}}', person_name='${person_name}' WHERE user_reference_id = '${req.body.user}'`
+        const updateCardData = `UPDATE card SET card_number= '${card_number}', cvv='${cvv}', card_type='${card_type}', valid_upto='${valid_upto}}', person_name='${person_name}' WHERE user_reference_id = '${req.body.user}'`
 
+        console.log(updateCardData)
 
-        await qb.query(updateAddressData, async (err, results) => {
+        if (!updateCardData) {
+            return res.status(500).json({
+                status: 'error',
+                message: "something went wrong while updating the card details"
+            })
+        }
 
-            if (err) {
-                console.log(err, "283")
-                return err;
-            } else {
-                if (results.affectedRows <= 0) {
-                    res.status(500).json({
-                        "message": 'Address is not updated'
-                    });
-                } else {
-                    res.status(200)
-                        .json({
-                            message: 'Address Supdated successfully'
-                        });
-                }
-            }
-
+        res.status(200).json({
+            "message": "card details updated successfully",
         })
+
+
 
     } catch (error) {
         console.log(error)

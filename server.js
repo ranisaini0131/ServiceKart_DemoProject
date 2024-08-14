@@ -28,7 +28,7 @@ export const qb = new queryBuilder(settings, 'mysql', 'single');
 
 //import api
 import userRoute from "./src/routes/userRoute.js"
-import addressRoute from "./src/routes/userRoute.js"
+import addressRoute from "./src/routes/addressRoutes.js"
 import cardRoute from "./src/routes/cardsRoutes.js"
 import productRoute from "./src/routes/productRoute.js"
 

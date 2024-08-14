@@ -227,21 +227,4 @@ export const updateUserProfile = async (req, res) => {
 
 
 
-// static async updateField(id, key, value) {
-//     const connection = await pool.getConnection();
-//     try {
-//         if (key === 'status' && value === '2') {
-//             // Implement soft delete
-//             await connection.query('UPDATE blogs SET status = ?, deleted_at = NOW() WHERE id = ?', [value, id]);
-//         } else {
-//             await connection.query(UPDATE blogs SET ${ key } = ? WHERE id = ?, [value, id]);
-//         }
-//         const [updatedRows] = await connection.query('SELECT * FROM blogs WHERE id = ?', [id]);
-//         return updatedRows[0];
-//     } finally {
-//         connection.release();
-//     }
-// }
-// }
-
 

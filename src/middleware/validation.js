@@ -34,8 +34,8 @@ export const addAddressValidation = Joi.object({
     user: Joi.number().required(),
     area: Joi.string().required(),
     landmark: Joi.string().required(),
-    person_Name: Joi.string().required(),
-    address_Type: Joi.string().required(),
+    person_name: Joi.string().required(),
+    address_type: Joi.string().required(),
     latitude: Joi.string().required(),
     longitude: Joi.string().required(),
     user_reference_id: Joi.string().required()
@@ -58,8 +58,8 @@ export const deleteAddressValidation = Joi.object({
 
 export const savedCardsValidation = Joi.object({
     user: Joi.number().required(),
-    card_number: Joi.string().required(),
-    cvv: Joi.string().required(),
+    card_number: Joi.number().required(),
+    cvv: Joi.number().required(),
     card_type: Joi.string().required(),
     valid_upto: Joi.string().required(),
     person_name: Joi.string().required(),
@@ -80,8 +80,8 @@ export const deleteCardValidation = Joi.object({
 
 export const updateCardValidation = Joi.object({
     user: Joi.number().required(),
-    card_number: Joi.string().required(),
-    cvv: Joi.string().required(),
+    card_number: Joi.number().required(),
+    cvv: Joi.number().required(),
     card_type: Joi.string().required(),
     valid_upto: Joi.string().required(),
     person_name: Joi.string().required(),
@@ -92,7 +92,6 @@ export const updateCardValidation = Joi.object({
 export const addProductToCartValidation = Joi.object({
     user: Joi.number().required(),
     product_reference_id: Joi.number().required(),
-    user_reference_id: Joi.number().required(),
     quantity: Joi.number().required()
 })
 
@@ -102,6 +101,13 @@ export const placeOrderValidation = Joi.object({
     price: Joi.required(),
     tax: Joi.required(),
     shipping_address: Joi.string().required(),
-    user_reference_id: Joi.number().required(),
+    order_details: [
+        {
+            order_reference_id: Joi.number().required(),
+            product_reference_id: Joi.number().required(),
+            price: Joi.required(),
+            tax: Joi.required(),
+        }
+    ]
 })
 

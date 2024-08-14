@@ -12,7 +12,7 @@ router.get("/addressList", verifyJWT, addressList)
 
 router.patch("/updateAddress", verifyJWT, validateSchema(updateAddressValidation), updateAddress)
 
-router.delete("/deleteAddress", verifyJWT, validateSchema(deleteAddressValidation), deleteAddress)
+router.delete("/deleteAddress/:id", verifyJWT, validateSchema(deleteAddressValidation), deleteAddress)
 
 
 export default router;

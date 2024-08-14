@@ -10,7 +10,7 @@ router.post("/addCards", verifyJWT, validateSchema(savedCardsValidation), addCar
 
 router.get("/getCardsList", verifyJWT, savedCardsList)
 
-router.delete("/deleteCards", verifyJWT, validateSchema(deleteCardValidation), deleteCard)
+router.delete("/deleteCard", verifyJWT, validateSchema(deleteCardValidation), deleteCard)
 
 router.patch("/updateCard", verifyJWT, validateSchema(updateCardValidation), updateCard)
 
