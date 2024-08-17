@@ -1,8 +1,8 @@
 import Router from "express"
 import { validateSchema } from "../utilities/helperSchema.js";
 import { verifyJWT } from "../middleware/verifyUser.js";
-import { addAddressValidation, updateAddressValidation, deleteAddressValidation } from "../middleware/validation.js";
-import { addAddress, addressList, updateAddress, deleteAddress } from "../controllers/address.js"
+import { addAddressValidation, updateAddressValidation } from "../middleware/validation.js";
+import { addAddress, addressList, updateAddress, updateStatus } from "../controllers/address.js"
 
 const router = Router();
 
@@ -12,7 +12,8 @@ router.get("/addressList", verifyJWT, addressList)
 
 router.patch("/updateAddress", verifyJWT, validateSchema(updateAddressValidation), updateAddress)
 
-router.delete("/deleteAddress/:id", verifyJWT, validateSchema(deleteAddressValidation), deleteAddress)
+router.patch("/updateStatus", verifyJWT, updateStatus)
+
 
 
 export default router;

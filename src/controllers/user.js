@@ -8,29 +8,22 @@ export const check_phone_number = async (req, res) => {
         //get user details from frontend
         const { phone_number } = req.body
 
-        //validation
-        if (!phone_number) {
-            return res.status(400).json({
-                status: "failed",
-                message: "Please provide all fields",
-            })
-        }
-
-
         //check if user already exists or not
-
-        const existedUser = `SELECT id FROM users WHERE phone_number = ${phone_number}`
+        const existedUser = `SELECT id 
+                             FROM users
+                             WHERE phone_number = ${phone_number}`
 
         await qb.query(existedUser, async (err, results) => {
             if (err) throw err;
 
             if (results.length > 0) {
+
                 return res.status(409).json({
                     status: "failed",
                     message: "User already exists"
                 });
+
             } else {
-                console.log('User does not exist');
                 return res.status(409).json({
                     status: "failed",
                     message: "User does not exists"
@@ -39,7 +32,7 @@ export const check_phone_number = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("error:", error)
+        console.log("check_phone_number", error)
     }
 }
 
@@ -50,18 +43,10 @@ export const signup = async (req, res) => {
         //get user details from frontend
         const { phone_number, first_name, last_name, DOB, email, gender } = req.body
 
-        //validation
-        if (!(phone_number || first_name || last_name || DOB || gender || email)) {
-            return res.status(400).json({
-                status: "failed",
-                message: "Please provide all fields",
-            })
-        }
-
-
         //check if user already exists or not
-
-        const existedUser = `SELECT id FROM users WHERE phone_number = ${phone_number}`
+        const existedUser = `SELECT id 
+                             FROM users
+                             WHERE phone_number = ${phone_number}`
 
         //extracting path
         const avatarPath = req.files.avatar[0].path
@@ -75,31 +60,37 @@ export const signup = async (req, res) => {
                     message: "User already exists"
                 });
             } else {
-                console.log('User does not exist');
-
                 //create new user
-                const newUser = await qb.query(`INSERT INTO users (phone_number ,first_name,last_name , DOB,gender,email, avatar) VALUES ('${phone_number}','${first_name}','${last_name}','${DOB}', '${gender}', '${email}', '${avatarPath}')`)
+                const newUser = await qb.query(`INSERT INTO users 
+                    (phone_number ,first_name,last_name , DOB,gender,email, avatar)
+                    VALUES (
+                    '${phone_number}',
+                    '${first_name}',
+                    '${last_name}',
+                    '${DOB}', 
+                    '${gender}', 
+                    '${email}', 
+                    '${avatarPath}')`)
 
-                console.log(newUser, "dd")
 
                 if (!newUser) {
                     return res.status(500).json({
                         status: 'error',
                         message: "something went wrong while registering the user"
                     })
+                } else {
+                    res.status(200).json({
+                        "message": "signup successful",
+                        "data": newUser
+                    })
                 }
-
-                res.status(200).json({
-                    "message": "signup successful",
-                    "data": newUser
-                })
 
             }
         })
 
 
     } catch (error) {
-        console.log("error:", error)
+        console.log("signup", error)
 
     }
 }
@@ -109,16 +100,11 @@ export const login = async (req, res) => {
     try {
         const { phone_number } = req.body
 
-        //check fields
-        if (!phone_number) {
-            return res.status(422).json({
-                status: "fail",
-                message: "Please provide required field"
-            })
-        }
-
         //check existed user
-        const existedUser = `SELECT id FROM users WHERE phone_number = ${phone_number}`
+        const existedUser = `SELECT id 
+                             FROM users
+                             WHERE
+                             phone_number = '${phone_number}'`
 
 
 
@@ -139,17 +125,20 @@ export const login = async (req, res) => {
                 )
 
                 if (!token) {
-                    return res.status(401).json({ message: 'Authentication failed' });
-                }
 
-                //return response 
-                return res
-                    .status(200)
-                    .json({
-                        status: 'success',
-                        data: token,
-                        message: "User Successfully"
-                    })
+                    return res.status(401).json({
+                        "message": 'Authentication failed'
+                    });
+
+                } else {
+                    return res
+                        .status(200)
+                        .json({
+                            status: 'success',
+                            data: token,
+                            message: "User Successfully"
+                        })
+                }
             } else {
                 console.log('User does not exist');
 
@@ -163,7 +152,7 @@ export const login = async (req, res) => {
 
 
     } catch (error) {
-        console.log("Error: ", error.message)
+        console.log("login ", error)
     }
 }
 
@@ -175,7 +164,16 @@ export const updateUserProfile = async (req, res) => {
         const { phone_number, first_name, last_name, DOB, email, gender } = req.body;
 
 
-        const updateData = `UPDATE users SET phone_number = '${phone_number}', first_name='${first_name}', last_name='${last_name}', DOB='${DOB}', email='${email}', gender='${gender}', avatar='${req.files.avatar[0].path}'  WHERE id = '${req.query.user}'`
+        const updateData = `UPDATE users 
+                            SET
+                            phone_number = '${phone_number}', 
+                            first_name='${first_name}', 
+                            last_name='${last_name}', 
+                            DOB='${DOB}', 
+                            email='${email}', 
+                            gender='${gender}', 
+                            avatar='${req.files.avatar[0].path}'  
+                            WHERE id = '${req.query.user}' AND user_reference_id='${user.body.user}'`
 
 
         await qb.query(updateData, async (err, results) => {
@@ -198,31 +196,10 @@ export const updateUserProfile = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
-        return res
-            .status(500)
-            .json({
-                status: "failed",
-                error: error.message
-            })
-
+        console.log("updateUserProfile", error)
     }
 }
 
-
-
-//store Details page 22
-
-
-//cancel order page 25
-
-
-//order page page 27
-
-
-//store details page 37
-
-//order details page 38
 
 
 

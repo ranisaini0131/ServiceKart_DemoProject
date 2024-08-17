@@ -8,7 +8,16 @@ export const addAddress = async (req, res) => {
 
 
         //insert data
-        const addAddress = await qb.query(`INSERT INTO address (area, landmark, person_Name, address_Type, latitude, longitude, user_reference_id) VALUES ('${area}','${landmark}','${person_name}','${address_type}', '${latitude}', '${longitude}', '${user_reference_id}')`)
+        const addAddress = await qb.query(`INSERT INTO address 
+                                           (area, landmark, person_Name, address_Type, latitude, longitude, user_reference_id)
+                                           VALUES (
+                                           '${area}',
+                                           '${landmark}',
+                                           '${person_name}',
+                                           '${address_type}', 
+                                           '${latitude}', 
+                                           '${longitude}', 
+                                           '${user_reference_id}')`)
 
 
         if (!addAddress) {
@@ -16,19 +25,15 @@ export const addAddress = async (req, res) => {
                 status: 'error',
                 message: "something went wrong while adding the address"
             })
+        } else {
+            res.status(200).json({
+                "message": "address added successfully",
+                "data": addAddress
+            })
         }
 
-        res.status(200).json({
-            "message": "address added successfully",
-            "data": addAddress
-        })
-
     } catch (error) {
-        console.log(error.message)
-        return res.status(409).json({
-            status: "failed",
-            message: "Address doesn't added"
-        });
+        console.log("addAddress", error)
     }
 
 }
@@ -37,20 +42,28 @@ export const addAddress = async (req, res) => {
 export const addressList = async (req, res) => {
     try {
 
-        const addressList = await qb.query(`SELECT area, landmark, person_name, address_type, latitude, longitude FROM address `)
+        const addressList = await qb.query(`SELECT 
+                                            area, landmark, person_name, address_type, latitude, longitude
+                                            FROM address
+                                            WHERE user_reference_id='${req.body.user}'
+                                            `)
 
-        res.status(200).json({
-            "message": "Address List",
-            "data": addressList
-        })
-
+        if (!addressList) {
+            res.status(200).json({
+                "message": "Address List Not found",
+            })
+        } else {
+            res.status(200).json({
+                "message": "Address List",
+                "data": addressList
+            })
+        }
 
     } catch (error) {
-        console.log(error.message)
+        console.log("addressList", error)
     }
-
-
 }
+
 
 //updateAddress
 export const updateAddress = async (req, res) => {
@@ -59,12 +72,19 @@ export const updateAddress = async (req, res) => {
         const { area, landmark, person_Name, address_Type, latitude, longitude } = req.body;
 
 
-        const updateAddressData = `UPDATE address SET area = '${area}', landmark='${landmark}', person_Name='${person_Name}', address_Type='${address_Type}', latitude='${latitude}', longitude='${longitude}' WHERE user_reference_id = '${req.body.user}'`
+        const updateAddressData = `UPDATE address 
+                                   SET
+                                   area = '${area}', 
+                                   landmark='${landmark}', 
+                                   person_Name='${person_Name}', 
+                                   address_Type='${address_Type}', 
+                                   latitude='${latitude}', 
+                                   longitude='${longitude}' 
+                                   WHERE user_reference_id = '${req.body.user}'`
 
         await qb.query(updateAddressData, async (err, results) => {
 
             if (err) {
-                console.log(err, "283")
                 return err;
             } else {
                 if (results.affectedRows <= 0) {
@@ -82,13 +102,7 @@ export const updateAddress = async (req, res) => {
         })
 
     } catch (error) {
-        console.log(error)
-        return res
-            .status(500)
-            .json({
-                status: "failed",
-                error: error.message
-            })
+        console.log("updateAddress", error)
 
     }
 
@@ -96,60 +110,28 @@ export const updateAddress = async (req, res) => {
 }
 
 
-//deleteAddress
-export const deleteAddress = async (req, res) => {
+//updateAddress
+//sir se check
+export const updateStatus = async (req, res) => {
     try {
 
-        const deleteData = await qb.query(`SELECT status from address`)
-        console.log(deleteData[0].status, "s")
+        const { status } = req.body
 
-        const addressStatus = deleteData[0].status
-
-        const deleteAddressQuery = qb.query(`UPDATE address SET status = 2 WHERE id='${req.body.user}'`)
-
-        if (addressStatus === 1) {
-            res.status(400).json({
-                "message": 'Address is active'
-            });
-        } else {
-            await qb.query(deleteAddressQuery, async (err, results) => {
-                if (err) {
-                    console.log(err, "284")
-                    return err;
-                } else {
-                    if (results.affectedRows <= 0) {
-                        res.status(500).json({
-                            "message": 'Address is not deleted'
-                        });
-                    } else {
-                        res.status(200).json({
-                            "message": 'Address deleted successfully'
-                        });
-                    }
-                }
-            })
+        // const statusQuery = await qb.query(`SELECT status, id 
+        //                                     FROM address`)
 
 
+        await qb.query(`UPDATE address 
+                                SET status = '${status}'
+                                WHERE id = '${addressId}' AND 
+                                user_reference_id='${req.body.user}'`)
 
-            // if (!deleteData) {
-            //     return res.status(500).json({
-            //         status: 'error',
-            //         message: "something went wrong while deleting the address"
-            //     })
-            // }
+        res.status(400).json({
+            "message": 'Address is deleted'
+        });
 
-            // res.status(200).json({
-            //     "message": "address deleted successfully",
-            //     "data": deleteData
-            // })
-        }
-    } catch {
-        console.log(error)
-        return res
-            .status(500)
-            .json({
-                status: "failed",
-                error: error.message
-            })
+    } catch (error) {
+        console.log("updateStatus", error)
     }
 }
+

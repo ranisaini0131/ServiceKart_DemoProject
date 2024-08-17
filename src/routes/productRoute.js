@@ -11,7 +11,7 @@ router.get("/getProduct", verifyJWT, getProductList)
 
 router.post("/addToCart", verifyJWT, validateSchema(addProductToCartValidation), addProductsToCart)
 
-router.post("/placeOrder", verifyJWT, validateSchema(placeOrderValidation), placeOrder)
+router.post("/placeOrder", verifyJWT, placeOrder) //validateSchema(placeOrderValidation), check how to pass array in validationn
 
 router.get("/orderList", verifyJWT, myOrdersList)
 
