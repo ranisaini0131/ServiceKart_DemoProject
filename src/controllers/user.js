@@ -2,10 +2,8 @@ import { qb } from "../../server.js"
 import jwt from "jsonwebtoken"
 
 
-//page 4
 export const check_phone_number = async (req, res) => {
     try {
-        //get user details from frontend
         const { phone_number } = req.body
 
         //check if user already exists or not
@@ -36,11 +34,9 @@ export const check_phone_number = async (req, res) => {
     }
 }
 
-//page 7
 
 export const signup = async (req, res) => {
     try {
-        //get user details from frontend
         const { phone_number, first_name, last_name, DOB, email, gender } = req.body
 
         //check if user already exists or not
@@ -156,11 +152,8 @@ export const login = async (req, res) => {
     }
 }
 
-
-//page 14
 export const updateUserProfile = async (req, res) => {
     try {
-
         const { phone_number, first_name, last_name, DOB, email, gender } = req.body;
 
 
@@ -173,7 +166,9 @@ export const updateUserProfile = async (req, res) => {
                             email='${email}', 
                             gender='${gender}', 
                             avatar='${req.files.avatar[0].path}'  
-                            WHERE id = '${req.query.user}' AND user_reference_id='${user.body.user}'`
+                            WHERE id ='${req.query.user}'`
+
+        console.log(updateData, "ghj")
 
 
         await qb.query(updateData, async (err, results) => {
@@ -181,14 +176,15 @@ export const updateUserProfile = async (req, res) => {
             if (err) {
                 return err;
             } else {
-                if (results.affectedRows <= 0) {
+                if (results.affectedRows == 0) {
                     res.status(500).json({
                         "message": 'User not found or no changes made'
                     });
                 } else {
                     res.status(200)
                         .json({
-                            message: 'User Data updated successfully'
+                            message: 'User Data updated successfully',
+                            data: results
                         });
                 }
             }

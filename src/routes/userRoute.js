@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { uploads } from "../middleware/multer.js";
-import { loginUser, phone_number_validation } from "../middleware/validation.js";
+import { loginUser, phone_number_validation, updateProfileValidation, userSchema } from "../middleware/validation.js";
 import { validateSchema } from "../utilities/helperSchema.js";
 import { login, signup, check_phone_number, updateUserProfile } from "../controllers/user.js";
 import { verifyJWT } from "../middleware/verifyUser.js";
@@ -16,14 +16,14 @@ router.post("/signup",
             maxCount: 1
         }
     ]),
-
+    validateSchema(userSchema),
     signup)
 
 router.post("/login",
     validateSchema(loginUser),
     login)
 
-router.patch("/updateUserProfile", verifyJWT, uploads.fields([
+router.patch("/updateUserProfile", verifyJWT, validateSchema(updateProfileValidation), uploads.fields([
     {
         name: "avatar",
         maxCount: 1

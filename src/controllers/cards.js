@@ -1,104 +1,97 @@
 import { qb } from "../../server.js"
 
-//page 17
-//how to take card details 
+
+//validation error
 export const addCards = async (req, res) => {
     try {
 
-        const { card_number, cvv, card_type, valid_upto, person_name, user_reference_id } = req.body
-        console.log(req.body)
+        const { card_number, cvv, card_type, valid_upto, person_name } = req.body
+
 
         //insert data
-        const addCards = await qb.query(`INSERT INTO card (card_number,cvv, card_type, valid_upto, person_name, user_reference_id) VALUES ('${card_number}','${cvv}','${card_type}','${valid_upto}', '${person_name}','${user_reference_id}')`)
+        const addCards = `INSERT INTO card 
+                                        (card_number,cvv, card_type, valid_upto, person_name, user_reference_id)
+                                        VALUES (
+                                        '${card_number}',
+                                        '${cvv}',
+                                        '${card_type}',
+                                        '${valid_upto}', 
+                                        '${person_name}',
+                                        '${req.body.user}')`
 
 
-        if (!addCards) {
-            return res.status(500).json({
-                status: 'error',
-                message: "something went wrong while adding the cards"
-            })
-        }
+        await qb.query(addCards, (err, results) => {
+            if (err) throw err;
 
-        res.status(200).json({
-            "message": "card added successfully",
-            "data": addCards
+            else if (results.length == 0) {
+                return res.status(500).json({
+                    status: 'error',
+                    message: "something went wrong while adding the cards"
+                })
+            } else {
+                res.status(200).json({
+                    "message": "card added successfully",
+                    "data": addCards
+                })
+            }
         })
 
+
     } catch (error) {
-        console.log(error.message)
-        return res.status(409).json({
-            status: "failed",
-            message: "Cards doesn't added"
-        });
+        console.log("addCards", error)
     }
 
 
 }
 
-//page18
+
 export const savedCardsList = async (req, res) => {
 
     try {
 
-        const savedCards = await qb.query(`SELECT card_number, cvv, card_type, valid_upto, person_name FROM card`)
+        const savedCards = `SELECT 
+                                           card.id,card_number, cvv, card_type, valid_upto, person_name
+                                           FROM card
+                                           WHERE status='1' AND user_reference_id='${req.body.user}'`
 
-        res.status(200).json({
-            "message": "Address List",
-            "data": savedCards
+
+        await qb.query(savedCards, (err, results) => {
+            if (err) throw err;
+
+            else if (results.length == 0) {
+                res.status(500).json({
+                    "message": "No Address List Found"
+                })
+            } else {
+                res.status(200).json({
+                    "message": "Address List",
+                    "data": results
+                })
+            }
         })
 
 
     } catch (error) {
-        console.log(error.message)
-        return res.status(409).json({
-            status: "failed",
-            message: "doesn/t get"
-        });
+        console.log("savedCardList", error)
     }
 
 }
 
-//deleteCard
-//implement soft delete
-export const deleteCard = async (req, res) => {
-    try {
-
-        const deleteData = await qb.query(`DELETE FROM cards WHERE user_reference_id = '${req.body.user}'`)
-
-
-        if (!deleteData) {
-            return res.status(500).json({
-                status: 'error',
-                message: "something went wrong while deleting the address"
-            })
-        }
-
-        res.status(200).json({
-            "message": "address deleted successfully",
-            "data": deleteData
-        })
-
-    } catch (error) {
-        console.log(error)
-        return res
-            .status(500)
-            .json({
-                status: "failed",
-                error: error.message
-            })
-    }
-}
-
-
-
-//updateCard
+//valildation error same as addCard
 export const updateCard = async (req, res) => {
     try {
 
         const { card_number, cvv, card_type, valid_upto, person_name } = req.body;
 
 
-        const updateCardData = `UPDATE card SET card_number= '${card_number}', cvv='${cvv}', card_type='${card_type}', valid_upto='${valid_upto}}', person_name='${person_name}' WHERE user_reference_id = '${req.body.user}'`
+        const updateCardData = await qb.query(`UPDATE card 
+                                SET 
+                                card_number= '${card_number}', 
+                                cvv='${cvv}', 
+                                card_type='${card_type}', 
+                                valid_upto='${valid_upto}', 
+                                person_name='${person_name}' 
+                                WHERE user_reference_id = '${req.body.user}'`)
 
         console.log(updateCardData)
 
@@ -127,4 +120,37 @@ export const updateCard = async (req, res) => {
     }
 
 
+}
+
+
+export const updateCardStatus = async (req, res) => {
+    try {
+
+        const { status, cardId } = req.body
+
+
+        await qb.query(`UPDATE card 
+                        SET status = '${status}'
+                        WHERE id = '${cardId}' AND 
+                        user_reference_id = '${req.body.user}'`)
+
+        let message;
+
+        switch (status) {
+            case '1':
+                message = 'Card is active';
+                break;
+            case '0':
+                message = 'Card is inactive';
+                break;
+            default:
+                message = 'Card is deleted';
+                break;
+        }
+
+        res.status(400).json({ message });
+
+    } catch (error) {
+        console.log("updateStatus", error)
+    }
 }
