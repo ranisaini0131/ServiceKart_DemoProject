@@ -58,8 +58,8 @@ export const updateAddressStatusValidation = Joi.object({
 
 export const savedCardsValidation = Joi.object({
     user: Joi.number().required(),
-    card_number: Joi.number().min(10).max(10).required(),
-    cvv: Joi.number().min(5).max(5).required(),
+    card_number: Joi.string().min(10).max(10).required(),
+    cvv: Joi.string().min(5).max(5).required(),
     card_type: Joi.string().required(),
     valid_upto: Joi.string().required(),
     person_name: Joi.string().required()

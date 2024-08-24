@@ -82,14 +82,12 @@ export const product_details = async (req, res) => {
 }
 
 
-//foreign key
 export const addProductsToCart = async (req, res) => {
     try {
 
         const { product_reference_id, quantity } = req.body
 
 
-        //add product to cart
         const addToCart = `INSERT INTO carts 
                            (product_reference_id, quantity, user_reference_id)
                            VALUES (

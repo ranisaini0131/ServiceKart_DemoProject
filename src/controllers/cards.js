@@ -1,14 +1,12 @@
 import { qb } from "../../server.js"
 
 
-//validation error
 export const addCards = async (req, res) => {
     try {
 
         const { card_number, cvv, card_type, valid_upto, person_name } = req.body
 
 
-        //insert data
         const addCards = `INSERT INTO card 
                                         (card_number,cvv, card_type, valid_upto, person_name, user_reference_id)
                                         VALUES (
@@ -31,7 +29,7 @@ export const addCards = async (req, res) => {
             } else {
                 res.status(200).json({
                     "message": "card added successfully",
-                    "data": addCards
+                    "data": results
                 })
             }
         })
@@ -77,7 +75,6 @@ export const savedCardsList = async (req, res) => {
 
 }
 
-//valildation error same as addCard
 export const updateCard = async (req, res) => {
     try {
 
@@ -93,7 +90,6 @@ export const updateCard = async (req, res) => {
                                 person_name='${person_name}' 
                                 WHERE user_reference_id = '${req.body.user}'`)
 
-        console.log(updateCardData)
 
         if (!updateCardData) {
             return res.status(500).json({
